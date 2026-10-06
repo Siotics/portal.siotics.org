@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { ADMIN_PROVIDER_ID } from "../../convex/roles";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -53,8 +54,7 @@ export function AuthMethods() {
 
   return (
     <>
-      <button
-        type="button"
+      <ButtonPrimitive
         onClick={continueWithGoogle}
         disabled={pending !== null}
         className={cn(
@@ -62,9 +62,8 @@ export function AuthMethods() {
         )}
       >
         {pending === "google" ? "Redirecting…" : "Continue with Google"}
-      </button>
-      <button
-        type="button"
+      </ButtonPrimitive>
+      <ButtonPrimitive
         onClick={continueWithSiotics}
         disabled={pending !== null}
         className={cn(
@@ -72,7 +71,7 @@ export function AuthMethods() {
         )}
       >
         {pending === "siotics" ? "Redirecting…" : "Continue with Siotics IdP"}
-      </button>
+      </ButtonPrimitive>
       {error ? (
         <p className={cn("text-sm text-red-600")} role="alert">
           {error}
