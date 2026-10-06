@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.12.5",
+    "better-auth": "~1.6.33",
+    "convex": "^1.46.0",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"
