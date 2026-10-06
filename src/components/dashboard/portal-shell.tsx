@@ -40,6 +40,12 @@ const THEME_STORAGE_KEY = "portal-theme";
 const PREFERENCE_CHANGE_EVENT = "portal-preference-change";
 const DESKTOP_QUERY = "(min-width: 768px)";
 type Theme = "light" | "dark";
+type Preferences = { theme: Theme; collapsed: boolean };
+type SidebarMode = "expanded" | "collapsed";
+
+const DEFAULT_PREFERENCES: Preferences = { theme: "light", collapsed: false };
+const NO_OP = () => {};
+let cachedPreferences = DEFAULT_PREFERENCES;
 
 function subscribeToPreferenceChanges(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange);
@@ -50,12 +56,20 @@ function subscribeToPreferenceChanges(onStoreChange: () => void) {
   };
 }
 
-function getTheme(): Theme {
-  return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
-}
+function getPreferences(): Preferences {
+  const nextPreferences: Preferences = {
+    theme: localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light",
+    collapsed: localStorage.getItem(SIDEBAR_STORAGE_KEY) === "collapsed",
+  };
 
-function getSidebarCollapsed() {
-  return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "collapsed";
+  if (
+    cachedPreferences.theme !== nextPreferences.theme ||
+    cachedPreferences.collapsed !== nextPreferences.collapsed
+  ) {
+    cachedPreferences = nextPreferences;
+  }
+
+  return cachedPreferences;
 }
 
 const NAV_ITEMS: {
@@ -77,12 +91,14 @@ function UserAvatar({ user, className }: { user: PortalUser; className?: string 
   return <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-950", className)}>{initials(user.name)}</span>;
 }
 
-function SidebarNavigation({ user, pathname, showLabels, onNavigate }: { user: PortalUser; pathname: string; showLabels: boolean; onNavigate: () => void }) {
+function SidebarNavigation({ user, pathname, mode, onNavigate }: { user: PortalUser; pathname: string; mode: SidebarMode; onNavigate: () => void }) {
+  const isExpanded = mode === "expanded";
+
   return (
     <>
-      <div className={cn(showLabels ? "mb-2 border-b border-zinc-200 p-2 dark:border-zinc-800" : null)}>
-        <Link href="/" onClick={onNavigate} title={showLabels ? undefined : "Siotics"} className={cn("flex items-center gap-2 rounded-lg p-2 dark:hover:bg-zinc-800 dark:focus-visible:outline-zinc-50", !showLabels && "justify-center")}>
-          <span className={cn(showLabels ? "grid min-w-0 text-left leading-tight" : "sr-only")}><span className="truncate text-sm font-medium">Siotics</span><span className="truncate text-xs text-zinc-600 dark:text-zinc-400">Portal</span></span>
+      <div className={cn(isExpanded ? "mb-2 border-b border-zinc-200 p-2 dark:border-zinc-800" : null)}>
+        <Link href="/" onClick={onNavigate} title={isExpanded ? undefined : "Siotics"} className={cn("flex items-center gap-2 rounded-lg p-2 dark:hover:bg-zinc-800 dark:focus-visible:outline-zinc-50", !isExpanded && "justify-center")}>
+          <span className={cn(isExpanded ? "grid min-w-0 text-left leading-tight" : "sr-only")}><span className="truncate text-sm font-medium">Siotics</span><span className="truncate text-xs text-zinc-600 dark:text-zinc-400">Portal</span></span>
         </Link>
       </div>
       <nav aria-label="Portal" className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-2 pb-2">
@@ -90,19 +106,19 @@ function SidebarNavigation({ user, pathname, showLabels, onNavigate }: { user: P
           {NAV_ITEMS.map((item) => {
             const active = pathname === item.href;
             const Icon = item.icon;
-            return <li key={item.href}><Link href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} title={showLabels ? undefined : item.label} className={cn("flex h-8 items-center gap-2 rounded-lg px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:focus-visible:outline-zinc-50", !showLabels && "justify-center", active ? "bg-zinc-200 font-medium text-zinc-950 dark:bg-zinc-800 dark:text-zinc-50" : "text-zinc-700 hover:bg-zinc-200/80 dark:text-zinc-300 dark:hover:bg-zinc-800")}><Icon size={16} aria-hidden /><span className={cn(showLabels ? "truncate" : "sr-only")}>{item.label}</span></Link></li>;
+            return <li key={item.href}><Link href={item.href} onClick={onNavigate} aria-current={active ? "page" : undefined} title={isExpanded ? undefined : item.label} className={cn("flex h-8 items-center gap-2 rounded-lg px-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:focus-visible:outline-zinc-50", !isExpanded && "justify-center", active ? "bg-zinc-200 font-medium text-zinc-950 dark:bg-zinc-800 dark:text-zinc-50" : "text-zinc-700 hover:bg-zinc-200/80 dark:text-zinc-300 dark:hover:bg-zinc-800")}><Icon size={16} aria-hidden /><span className={cn(isExpanded ? "truncate" : "sr-only")}>{item.label}</span></Link></li>;
           })}
         </ul>
       </nav>
       <DropdownMenu>
         <div className="p-2">
-          <DropdownMenuTrigger title={showLabels ? undefined : user.name} render={<button type="button" className={cn("flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-zinc-200/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:hover:bg-zinc-800 dark:focus-visible:outline-zinc-50", !showLabels && "justify-center")} />}>
+          <DropdownMenuTrigger title={isExpanded ? undefined : user.name} render={<button type="button" className={cn("flex w-full items-center gap-2 rounded-lg p-2 text-left hover:bg-zinc-200/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:hover:bg-zinc-800 dark:focus-visible:outline-zinc-50", !isExpanded && "justify-center")} />}>
             <UserAvatar user={user} />
-            <span className={cn(showLabels ? "grid min-w-0 flex-1 text-left leading-tight" : "sr-only")}><span className="truncate text-sm font-medium">{user.name}</span><span className="truncate text-xs text-zinc-600 dark:text-zinc-400">{user.email}</span></span>
-            <CaretUpDownIcon size={16} aria-hidden="true" className={cn(showLabels ? "shrink-0 text-zinc-500" : "sr-only")} />
+            <span className={cn(isExpanded ? "grid min-w-0 flex-1 text-left leading-tight" : "sr-only")}><span className="truncate text-sm font-medium">{user.name}</span><span className="truncate text-xs text-zinc-600 dark:text-zinc-400">{user.email}</span></span>
+            <CaretUpDownIcon size={16} aria-hidden="true" className={cn(isExpanded ? "shrink-0 text-zinc-500" : "sr-only")} />
           </DropdownMenuTrigger>
         </div>
-        <DropdownMenuContent side={showLabels ? "top" : "right"} align="end" className="w-56 rounded-lg border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
+        <DropdownMenuContent side={isExpanded ? "top" : "right"} align="end" className="w-56 rounded-lg border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
           <DropdownMenuGroup>
             <DropdownMenuLabel className="px-2 py-1.5 text-xs text-zinc-600 dark:text-zinc-400">{roleLabel(user.role)}</DropdownMenuLabel>
             <DropdownMenuItem render={<Link href="/account" />} onClick={onNavigate} className="gap-2 rounded-md px-2 py-1.5 text-sm font-normal hover:bg-zinc-100 focus:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800"><UserIcon size={16} aria-hidden="true" />Account</DropdownMenuItem>
@@ -116,12 +132,15 @@ function SidebarNavigation({ user, pathname, showLabels, onNavigate }: { user: P
 
 export function PortalShell({ user, children, className }: { user: PortalUser; children: ReactNode; className?: string }) {
   const pathname = usePathname();
-  const theme = useSyncExternalStore(subscribeToPreferenceChanges, getTheme, () => "light");
-  const collapsed = useSyncExternalStore(subscribeToPreferenceChanges, getSidebarCollapsed, () => false);
+  const { theme, collapsed } = useSyncExternalStore(
+    subscribeToPreferenceChanges,
+    getPreferences,
+    () => DEFAULT_PREFERENCES
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktop, setDesktop] = useState(true);
   const [interactiveTheme, setInteractiveTheme] = useState(false);
-  const showLabels = !desktop || !collapsed;
+  const sidebarMode: SidebarMode = desktop && collapsed ? "collapsed" : "expanded";
   const sidebarExpanded = desktop ? !collapsed : mobileOpen;
   const pageLabel = NAV_ITEMS.find((item) => item.href === pathname)?.label ?? "Portal";
 
@@ -167,8 +186,8 @@ export function PortalShell({ user, children, className }: { user: PortalUser; c
       <p className="ml-auto text-sm text-zinc-600 dark:text-zinc-400">{roleLabel(user.role)}</p>
     </header>
     <div className="flex flex-1">
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}><SheetContent side="left" showCloseButton={false} className="top-14 h-[calc(100dvh-3.5rem)] w-64 border-zinc-200 bg-zinc-50 p-0 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 md:hidden"><SheetHeader className="sr-only"><SheetTitle>Portal navigation</SheetTitle><SheetDescription>Navigate the Siotics portal.</SheetDescription></SheetHeader><SidebarNavigation user={user} pathname={pathname} showLabels onNavigate={() => setMobileOpen(false)} /></SheetContent></Sheet>
-      <aside className={cn("fixed top-14 bottom-0 left-0 z-30 hidden w-64 flex-col border-r border-zinc-200 bg-zinc-50 motion-safe:transition-[width] motion-safe:duration-200 dark:border-zinc-800 dark:bg-zinc-950 md:flex", collapsed ? "md:w-14" : "md:w-64")}><SidebarNavigation user={user} pathname={pathname} showLabels={showLabels} onNavigate={() => undefined} /></aside>
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}><SheetContent side="left" showCloseButton={false} className="top-14 h-[calc(100dvh-3.5rem)] w-64 border-zinc-200 bg-zinc-50 p-0 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 md:hidden"><SheetHeader className="sr-only"><SheetTitle>Portal navigation</SheetTitle><SheetDescription>Navigate the Siotics portal.</SheetDescription></SheetHeader><SidebarNavigation user={user} pathname={pathname} mode="expanded" onNavigate={() => setMobileOpen(false)} /></SheetContent></Sheet>
+      <aside className={cn("fixed top-14 bottom-0 left-0 z-30 hidden w-64 flex-col border-r border-zinc-200 bg-zinc-50 motion-safe:transition-[width] motion-safe:duration-200 dark:border-zinc-800 dark:bg-zinc-950 md:flex", collapsed ? "md:w-14" : "md:w-64")}><SidebarNavigation user={user} pathname={pathname} mode={sidebarMode} onNavigate={NO_OP} /></aside>
       <main className={cn("flex min-w-0 flex-1 flex-col motion-safe:transition-[padding] motion-safe:duration-200", collapsed ? "md:pl-14" : "md:pl-64")}>{children}</main>
     </div>
   </div>;
