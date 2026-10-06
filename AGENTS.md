@@ -23,7 +23,7 @@ Convex agent skills for common tasks can be installed by running
 <!-- convex-ai-end -->
 
 Instructions for custom deviations:
-- Dependency manager: `pnpm` (Do not use npm or yarn) if the deps manager not installed tell user to install it.
+- Dependency manager: `pnpm` (Do not use npm or yarn) if the deps manager not installed tell user to install it
 
 Instructions for codebase:
 - Follow YAGNI principles
@@ -34,7 +34,7 @@ Instructions for codebase:
 - Utilize design patterns, but dont over design
 
 Naming conventions:
-- Be descriptive: Choose intention-revealing, searchable, and unambiguous names.
-- Use verbs and nouns: Name classes with nouns (e.g., UserAccount) and methods or functions with verbs (e.g., calculateTotal).
-- Avoid magic numbers: Replace hardcoded values with named constants.
-- Skip encodings: Do not append type prefixes or prefixes like m_ to your variable names.
+- Be descriptive: Choose intention-revealing, searchable, and unambiguous names
+- Use verbs and nouns: Name classes with nouns (e.g., UserAccount) and methods or functions with verbs (e.g., calculateTotal)
+- Avoid magic numbers: Replace hardcoded values with named constants
+- Skip encodings: Do not append type prefixes or prefixes like m_ to your variable names
