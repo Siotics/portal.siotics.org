@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ADMIN_PROVIDER_ID } from "../../convex/roles";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 function authErrorMessage(error: unknown) {
   if (error && typeof error === "object" && "message" in error) {
@@ -56,7 +57,9 @@ export function AuthMethods() {
         type="button"
         onClick={continueWithGoogle}
         disabled={pending !== null}
-        className="flex h-11 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-950"
+        className={cn(
+          "flex h-11 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
+        )}
       >
         {pending === "google" ? "Redirecting…" : "Continue with Google"}
       </button>
@@ -64,12 +67,14 @@ export function AuthMethods() {
         type="button"
         onClick={continueWithSiotics}
         disabled={pending !== null}
-        className="flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium disabled:opacity-60 dark:border-white/15"
+        className={cn(
+          "flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+        )}
       >
         {pending === "siotics" ? "Redirecting…" : "Continue with Siotics IdP"}
       </button>
       {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className={cn("text-sm text-red-600")} role="alert">
           {error}
         </p>
       ) : null}
