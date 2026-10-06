@@ -22,6 +22,9 @@ Convex agent skills for common tasks can be installed by running
 
 <!-- convex-ai-end -->
 
+Instructions for custom deviations:
+- Dependency manager: `pnpm` (Do not use npm or yarn) if the deps manager not installed tell user to install it.
+
 Instructions for codebase:
 - Follow YAGNI principles
 - Follow SRP (Single Responsibility) principles, ensure every class, module, or function has only one reason to change
