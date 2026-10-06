@@ -58,7 +58,7 @@ export function AuthMethods() {
         onClick={continueWithGoogle}
         disabled={pending !== null}
         className={cn(
-          "flex h-11 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
+          "flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-50 disabled:opacity-60"
         )}
       >
         {pending === "google" ? "Redirecting…" : "Continue with Google"}
@@ -67,7 +67,8 @@ export function AuthMethods() {
         onClick={continueWithSiotics}
         disabled={pending !== null}
         className={cn(
-          "flex h-11 items-center justify-center rounded-full border border-black/10 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+        "flex h-11 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-60"
+          
         )}
       >
         {pending === "siotics" ? "Redirecting…" : "Continue with Siotics IdP"}

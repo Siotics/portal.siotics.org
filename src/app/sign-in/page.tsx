@@ -18,7 +18,7 @@ export default async function SignInPage() {
   return (
     <AuthScreen
       title="Sign in"
-      description="Sign in to the portal."
+      description="Where anyone can build cool stuff!"
     >
       <AuthMethods />
     </AuthScreen>

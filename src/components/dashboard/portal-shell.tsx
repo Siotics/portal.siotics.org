@@ -33,13 +33,12 @@ import {
 } from "@/components/ui/sheet";
 import { SignOutMenuItem } from "@/components/sign-out-button";
 import { initials, roleLabel, type PortalUser } from "@/lib/portal-user";
+import { THEME_STORAGE_KEY, setThemeCookie, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_STORAGE_KEY = "portal-sidebar";
-const THEME_STORAGE_KEY = "portal-theme";
 const PREFERENCE_CHANGE_EVENT = "portal-preference-change";
 const DESKTOP_QUERY = "(min-width: 768px)";
-type Theme = "light" | "dark";
 type Preferences = { theme: Theme; collapsed: boolean };
 type SidebarMode = "expanded" | "collapsed";
 
@@ -85,7 +84,7 @@ function UserAvatar({ user, className }: { user: PortalUser; className?: string 
   const [failed, setFailed] = useState(false);
 
   if (user.image && !failed) {
-    return <Image src={user.image} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} className={cn("size-8 rounded-lg object-cover", className)} />;
+    return <Image src={user.image} alt="" width={32} height={32} referrerPolicy="no-referrer" onError={() => setFailed(true)} className={cn("size-8 rounded-lg object-cover", className)} />;
   }
 
   return <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-950", className)}>{initials(user.name)}</span>;
@@ -174,6 +173,7 @@ export function PortalShell({ user, children, className }: { user: PortalUser; c
     document.documentElement.classList.toggle("dark", nextTheme === "dark");
     document.documentElement.style.colorScheme = nextTheme;
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    setThemeCookie(nextTheme);
     window.dispatchEvent(new Event(PREFERENCE_CHANGE_EVENT));
   }
 

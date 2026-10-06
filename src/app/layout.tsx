@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { getToken } from "@/lib/auth-server";
+import { THEME_COOKIE_NAME, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -24,21 +26,21 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const token = await getToken();
+  const [token, cookieStore] = await Promise.all([getToken(), cookies()]);
+  const theme: Theme = cookieStore.get(THEME_COOKIE_NAME)?.value === "dark" ? "dark" : "light";
 
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(geistSans.variable, geistMono.variable, "h-full antialiased")}
+      className={cn(
+        geistSans.variable,
+        geistMono.variable,
+        "h-full antialiased",
+        theme === "dark" && "dark",
+      )}
+      style={{ colorScheme: theme }}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=window.location.pathname;if(!p.startsWith('/sign-in')){var t=localStorage.getItem('portal-theme');if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}else{document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';}}else{document.documentElement.classList.remove('dark');document.documentElement.style.colorScheme='light';}}catch(e){}})();`,
-          }}
-        />
-      </head>
       <body className="min-h-full flex flex-col">
         <ConvexClientProvider initialToken={token}>{children}</ConvexClientProvider>
       </body>
