@@ -1,11 +1,11 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { Menu } from "@base-ui/react/menu";
 import { SignOutIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 function useSignOut() {
   const router = useRouter();
@@ -41,12 +41,12 @@ export function SignOutMenuItem() {
   const signOut = useSignOut();
 
   return (
-    <DropdownMenuItem
+    <Menu.Item
       onClick={signOut}
-      className="gap-2 rounded-md px-2 py-1.5 text-sm font-normal hover:bg-zinc-100 focus:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800"
+      className="flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm font-normal outline-none select-none hover:bg-zinc-100 focus:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800"
     >
       <SignOutIcon size={16} aria-hidden="true" />
       Sign out
-    </DropdownMenuItem>
+    </Menu.Item>
   );
 }
